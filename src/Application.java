@@ -56,7 +56,7 @@ public class Application {
             float renderOffsetY = (GetScreenHeight() - renderHeight) * 0.5f;
 
             BeginTextureMode(target);
-                ClearBackground(white);  
+                ClearBackground(blue);  
                 DrawTexturePro(boardTexture,
                     rect(0.0f, 0.0f, (float)boardTexture.width(), ((float)boardTexture.height())),
                     rect(0.0f, 0.0f, (float)appScreenWidth, (float)appScreenHeight),
