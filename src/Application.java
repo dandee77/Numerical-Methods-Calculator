@@ -9,6 +9,7 @@ public class Application {
     private final int appScreenHeight = 6000;
     private Camera2D camera;
     private ResourceManager resourceManager = new ResourceManager();
+    private Canvas canvas = new Canvas();
     
     public Application() {
         
@@ -29,6 +30,8 @@ public class Application {
 
         // resourceManager = new ResourceManager();
         resourceManager.loadResources();
+
+
     }
 
     public void run() {
@@ -58,6 +61,8 @@ public class Application {
             BeginTextureMode(target);
                 ClearBackground(blue);  
 
+                canvas.update();
+                canvas.draw();
                 // DrawTexturePro(boardTexture,
                 //     rect(0.0f, 0.0f, (float)boardTexture.width(), ((float)boardTexture.height())),
                 //     rect(0.0f, 0.0f, (float)appScreenWidth, (float)appScreenHeight),
