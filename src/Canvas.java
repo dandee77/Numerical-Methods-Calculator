@@ -4,11 +4,13 @@ import static src.Utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class Canvas {
-    private List<List<StrokePoint>> strokes = new ArrayList<>();
+    private Stack<List<StrokePoint>> strokeStack = new Stack<>();
+    private Stack<List<StrokePoint>> redoStack = new Stack<>();
     private List<StrokePoint> currentStroke = new ArrayList<>();
-    private boolean showOutput = false;
+    // private boolean showOutput = false;
     
     // Drawing settings
     private final float strokeWidth = 50.0f;
@@ -29,23 +31,34 @@ public class Canvas {
     public void update() {
         // Undo with Ctrl+Z
         if (IsKeyPressed(KEY_Z) && IsKeyDown(KEY_LEFT_CONTROL)) {
-            if (!strokes.isEmpty()) {
-                strokes.remove(strokes.size() - 1);
+            if (!strokeStack.isEmpty()) {
+                // Move from stroke stack to redo stack
+                redoStack.push(strokeStack.pop());
+            }
+        }
+        // Redo with Y
+        else if (IsKeyPressed(KEY_Y)) {
+            if (!redoStack.isEmpty()) {
+                // Move from redo stack back to stroke stack
+                strokeStack.push(redoStack.pop());
             }
         }
         // Clear with R
         else if (IsKeyPressed(KEY_R)) {
-            strokes.clear();
+            strokeStack.clear();
+            redoStack.clear(); // Clear both stacks when clearing canvas
         }
         // Start new stroke on mouse press
         else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             currentStroke.clear();
+            redoStack.clear(); // Clear redo stack when starting new stroke
         }
         // Continue stroke while mouse is down
         else if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             Vector2 currentMousePosition = GetMousePosition();
             
-            if (currentStroke.isEmpty() || Vector2Distance(currentStroke.get(currentStroke.size() - 1).position, currentMousePosition) > strokeThreshold) {
+            if (currentStroke.isEmpty() || 
+                Vector2Distance(currentStroke.get(currentStroke.size() - 1).position, currentMousePosition) > strokeThreshold) {
                 currentStroke.add(new StrokePoint(
                     vec2(currentMousePosition.x(), currentMousePosition.y()),
                     strokeWidth / 2
@@ -54,14 +67,14 @@ public class Canvas {
         }
         // Finish stroke on mouse release
         else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !currentStroke.isEmpty()) {
-            strokes.add(new ArrayList<>(currentStroke));
+            strokeStack.push(new ArrayList<>(currentStroke));
             currentStroke.clear();
         }
     }
 
     public void draw() {
-        // Render completed strokes
-        for (List<StrokePoint> stroke : strokes) {
+        // Render completed strokes from the stack
+        for (List<StrokePoint> stroke : strokeStack) {
             for (int i = 1; i < stroke.size(); i++) {
                 StrokePoint prev = stroke.get(i - 1);
                 StrokePoint current = stroke.get(i);
@@ -100,11 +113,4 @@ public class Canvas {
             );
         }
     }
-    
-    // Helper method to calculate distance between two points
-    // private float Vector2Distance(Vector2 a, Vector2 b) {
-    //     float dx = a.x() - b.x();
-    //     float dy = a.y() - b.y();
-    //     return (float)Math.sqrt(dx * dx + dy * dy);
-    // }
 }
