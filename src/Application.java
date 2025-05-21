@@ -1,20 +1,14 @@
 package src;
 import static com.raylib.Raylib.*;
-import static src.Utils.*;
-
-import com.raylib.Raylib.Camera2D;
-import com.raylib.Raylib.RenderTexture;
-import com.raylib.Raylib.Texture;
-import com.raylib.Raylib.Vector2;
+import static src.Utils.*; // idfk why java need this when it was literally in the same package
 
 public class Application {
 
     private RenderTexture target;
-    private Texture boardTexture;
-    private Texture cursorTexture;
-    private final int appScreenWidth = 3840;
-    private final int appScreenHeight = 2160;
+    private final int appScreenWidth = 8000;
+    private final int appScreenHeight = 6000;
     private Camera2D camera;
+    private ResourceManager resourceManager = new ResourceManager();
     
     public Application() {
         
@@ -33,8 +27,8 @@ public class Application {
         camera.rotation(0.0f);
         camera.zoom(1.0f);
 
-        boardTexture = LoadTexture("assets/board.png");
-        cursorTexture = LoadTexture("assets/cursor.png");
+        // resourceManager = new ResourceManager();
+        resourceManager.loadResources();
     }
 
     public void run() {
@@ -55,17 +49,24 @@ public class Application {
             float renderOffsetX = (GetScreenWidth() - renderWidth) * 0.5f;
             float renderOffsetY = (GetScreenHeight() - renderHeight) * 0.5f;
 
+            if (IsKeyPressed(KEY_ENTER)) 
+            {
+                TakeScreenshot("output.png");
+                System.out.println("Screenshot taken");
+            }
+
             BeginTextureMode(target);
                 ClearBackground(blue);  
-                DrawTexturePro(boardTexture,
-                    rect(0.0f, 0.0f, (float)boardTexture.width(), ((float)boardTexture.height())),
-                    rect(0.0f, 0.0f, (float)appScreenWidth, (float)appScreenHeight),
-                    Vector2Zero(), 0.0f, white);
 
-                DrawTexturePro(cursorTexture,
-                    rect(0.0f, 0.0f, (float)cursorTexture.width(), ((float)cursorTexture.height())),
-                    rect(GetMouseX(), GetMouseY(), (float)cursorTexture.width(), (float)cursorTexture.height()),
-                    Vector2Zero(), 0.0f, white);
+                // DrawTexturePro(boardTexture,
+                //     rect(0.0f, 0.0f, (float)boardTexture.width(), ((float)boardTexture.height())),
+                //     rect(0.0f, 0.0f, (float)appScreenWidth, (float)appScreenHeight),
+                //     Vector2Zero(), 0.0f, white);
+
+                // DrawTexturePro(cursorTexture,
+                //     rect(0.0f, 0.0f, (float)cursorTexture.width(), ((float)cursorTexture.height())),
+                //     rect(GetMouseX(), GetMouseY(), (float)cursorTexture.width(), (float)cursorTexture.height()),
+                //     Vector2Zero(), 0.0f, white);
                 
             EndTextureMode();
 
@@ -77,5 +78,7 @@ public class Application {
                     Vector2Zero(), 0.0f, white);
             EndDrawing();
         }
+
+        resourceManager.unloadResources();
     }
 }
